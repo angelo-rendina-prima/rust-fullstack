@@ -1,0 +1,56 @@
+{
+  "db": "PostgreSQL",
+  "81178f1740cba659996f616c572bffa13d40b3f3a333422edb0de0b3db1bfdab": {
+    "query": "\n        SELECT\n            id, email\n        FROM users\n        WHERE id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Uuid"
+        },
+        {
+          "ordinal": 1,
+          "name": "email",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      },
+      "nullable": [
+        false,
+        false
+      ]
+    }
+  },
+  "9e996d232b50f3c244de8e1aba7d2308af8dab44fe8059d2f1d39fc781cadf95": {
+    "query": "\n        SELECT\n            id, email\n        FROM users\n        WHERE email = $1 AND password = $2\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Uuid"
+        },
+        {
+          "ordinal": 1,
+          "name": "email",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false
+      ]
+    }
+  }
+}

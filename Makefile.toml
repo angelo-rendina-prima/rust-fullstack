@@ -1,0 +1,44 @@
+[env]
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/todo"
+RUST_LOG="debug"
+
+[config]
+default_to_workspace = false
+
+[tasks.check]
+description = "Run check in workspace project"
+command = "cargo"
+args = ["check", "--all-features", "--workspace"]
+
+[tasks.run]
+description = "Runs in dev mode."
+command = "cargo"
+args = ["run"]
+dependencies = ["db-setup"]
+
+[tasks.db-setup]
+description = "Setup DB"
+command = "sqlx"
+args = ["database", "setup", "--source=./migrations/"]
+
+[tasks.db-reset]
+description = "Reset DB"
+command = "sqlx"
+args = ["database", "reset", "-y", "--source=./migrations/"]
+
+[tasks.db-prepare]
+description = "Use sqlx cargo command to prepare query file"
+command = "cargo"
+args = ["sqlx", "prepare", "--merged"]
+dependencies = ["db-setup"]
+
+[tasks.db-migration]
+description = "Use sqlx cargo command to create a new migration"
+command = "cargo"
+args = ["sqlx", "migrate", "add", "-r", "${@}"]
+
+[tasks.test]
+description = "Runs only unit tests."
+command = "cargo"
+args = ["test", "--workspace"]
+dependencies = ["db-setup"]
