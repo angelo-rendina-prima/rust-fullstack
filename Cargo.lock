@@ -133,7 +133,7 @@ dependencies = [
  "derive_more",
  "serde",
  "serde_json",
- "time",
+ "time 0.3.9",
  "tracing",
 ]
 
@@ -183,7 +183,7 @@ dependencies = [
  "serde_urlencoded",
  "smallvec",
  "socket2",
- "time",
+ "time 0.3.9",
  "url",
 ]
 
@@ -324,6 +324,7 @@ version = "0.1.0"
 dependencies = [
  "actix-session",
  "actix-web",
+ "chrono",
  "env_logger",
  "serde",
  "sqlx",
@@ -423,6 +424,8 @@ dependencies = [
  "libc",
  "num-integer",
  "num-traits",
+ "serde",
+ "time 0.1.43",
  "winapi",
 ]
 
@@ -455,7 +458,7 @@ dependencies = [
  "rand",
  "sha2",
  "subtle",
- "time",
+ "time 0.3.9",
  "version_check",
 ]
 
@@ -1702,6 +1705,16 @@ dependencies = [
 
 [[package]]
 name = "time"
+version = "0.1.43"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ca8a50ef2360fbd1eeb0ecd46795a87a19024eb4b53c5dc916ca1fd95fe62438"
+dependencies = [
+ "libc",
+ "winapi",
+]
+
+[[package]]
+name = "time"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2702e08a7a860f005826c6815dcac101b19b5eb330c27fe4a5928fec1d20ddd"
@@ -1887,6 +1900,7 @@ version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bc5cf98d8186244414c848017f0e2676b3fcb46807f6668a97dfe67359a3c4b7"
 dependencies = [
+ "getrandom",
  "serde",
 ]
 

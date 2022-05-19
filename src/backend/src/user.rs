@@ -1,10 +1,18 @@
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct User {
-    pub id: uuid::Uuid,
-    pub email: String,
+    id: uuid::Uuid,
+    email: String,
 }
 
 impl User {
+    pub fn id(&self) -> &uuid::Uuid {
+        &self.id
+    }
+
+    pub fn email(&self) -> &str {
+        &self.email
+    }
+
     pub async fn get_by_credentials(
         executor: impl sqlx::PgExecutor<'_>,
         email: &str,

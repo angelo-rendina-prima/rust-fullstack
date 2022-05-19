@@ -1,19 +1,23 @@
 pub async fn whoami(session: actix_session::Session) -> actix_web::HttpResponse {
     match session.get::<crate::user::User>("user") {
-        Ok(Some(user)) => {
-            actix_web::HttpResponse::Ok().body(format!("{}\n{}", &user.email, &user.id,))
-        }
+        Ok(Some(user)) => actix_web::HttpResponse::Ok().json(user),
         _ => actix_web::HttpResponse::Unauthorized().finish(),
     }
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct LoginCredentials {
+    email: String,
+    password: String,
 }
 
 pub async fn login(
     app: actix_web::web::Data<crate::App>,
     session: actix_session::Session,
-    path: actix_web::web::Path<(String, String)>,
+    credentials: actix_web::web::Json<LoginCredentials>,
 ) -> actix_web::HttpResponse {
-    let (email, password) = path.into_inner();
-    let auth_result = crate::user::User::get_by_credentials(&app.pool, &email, &password).await;
+    let LoginCredentials { email, password } = credentials.into_inner();
+    let auth_result = crate::user::User::get_by_credentials(app.pool(), &email, &password).await;
     match auth_result {
         Ok(Some(user)) => {
             session

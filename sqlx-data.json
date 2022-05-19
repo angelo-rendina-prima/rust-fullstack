@@ -1,7 +1,7 @@
 {
   "db": "PostgreSQL",
-  "81178f1740cba659996f616c572bffa13d40b3f3a333422edb0de0b3db1bfdab": {
-    "query": "\n        SELECT\n            id, email\n        FROM users\n        WHERE id = $1\n            ",
+  "0281667bf30e92b97545b713abe716ee526c9dd64d41777013391e9c118276eb": {
+    "query": "\n        SELECT\n            id, author_id, created_at, completed_at, message\n        FROM todos\n        WHERE author_id = $1\n            ",
     "describe": {
       "columns": [
         {
@@ -11,7 +11,22 @@
         },
         {
           "ordinal": 1,
-          "name": "email",
+          "name": "author_id",
+          "type_info": "Uuid"
+        },
+        {
+          "ordinal": 2,
+          "name": "created_at",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 3,
+          "name": "completed_at",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 4,
+          "name": "message",
           "type_info": "Text"
         }
       ],
@@ -22,6 +37,53 @@
       },
       "nullable": [
         false,
+        false,
+        false,
+        true,
+        false
+      ]
+    }
+  },
+  "07fbc87ef39294e07c42cf1747c04775943dbc946fc483f3c6369dffcd0e485a": {
+    "query": "\n        SELECT\n            id, author_id, created_at, completed_at, message\n        FROM todos\n        WHERE id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Uuid"
+        },
+        {
+          "ordinal": 1,
+          "name": "author_id",
+          "type_info": "Uuid"
+        },
+        {
+          "ordinal": 2,
+          "name": "created_at",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 3,
+          "name": "completed_at",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 4,
+          "name": "message",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        true,
         false
       ]
     }

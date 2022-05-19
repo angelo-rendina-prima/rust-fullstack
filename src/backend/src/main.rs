@@ -1,8 +1,15 @@
 mod auth;
+mod todo;
 mod user;
 
 pub struct App {
     pool: sqlx::Pool<sqlx::Postgres>,
+}
+
+impl App {
+    pub fn pool(&self) -> &sqlx::Pool<sqlx::Postgres> {
+        &self.pool
+    }
 }
 
 #[actix_web::main]
@@ -27,12 +34,15 @@ async fn main() -> std::io::Result<()> {
             .route("/", actix_web::web::get().to(actix_web::HttpResponse::Ok))
             .service(
                 actix_web::web::scope("/auth")
-                    .route("/whoami", actix_web::web::get().to(auth::whoami))
+                    .route("/", actix_web::web::get().to(auth::whoami))
                     .route("/logout", actix_web::web::post().to(auth::logout))
-                    .service(
-                        actix_web::web::resource("/login/{email}/{password}")
-                            .route(actix_web::web::post().to(auth::login)),
-                    ),
+                    .route("/login", actix_web::web::post().to(auth::login)),
+            )
+            .service(
+                actix_web::web::scope("/todo")
+                    .route("/", actix_web::web::get().to(todo::get_all_for_active_user))
+                    .route("/new", actix_web::web::post().to(todo::create))
+                    .route("/resolve", actix_web::web::post().to(todo::resolve)),
             )
     })
     .bind(("0.0.0.0", 3000))?
