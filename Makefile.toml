@@ -1,9 +1,11 @@
 [env]
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/todo"
 RUST_LOG="debug"
+PORT="8080"
 
 [config]
 default_to_workspace = false
+skip_core_tasks = true
 
 [tasks.check]
 description = "Run check in workspace project"
@@ -11,10 +13,22 @@ command = "cargo"
 args = ["check", "--all-features", "--workspace"]
 
 [tasks.run]
-description = "Runs in dev mode."
+description = "Runs backend in dev mode."
 command = "cargo"
 args = ["run"]
 dependencies = ["db-setup"]
+
+[tasks.build]
+description = "Build frontend with wasm-pack"
+install_crate = { crate_name = "wasm-pack", binary = "wasm-pack", test_arg = "-V" }
+command = "wasm-pack"
+args = ["build", "./src/frontend", "--target", "web", "--out-name", "package", "--dev"]
+
+[tasks.serve]
+description = "Start frontend server"
+install_crate = { crate_name = "microserver", binary = "microserver", test_arg = "-h" }
+command = "microserver"
+args = ["./src/frontend", "--port", "${PORT}"]
 
 [tasks.db-setup]
 description = "Setup DB"
