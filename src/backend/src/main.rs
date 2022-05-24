@@ -26,11 +26,17 @@ async fn main() -> std::io::Result<()> {
     actix_web::HttpServer::new(move || {
         actix_web::App::new()
             .app_data(app.clone())
+            .wrap(actix_cors::Cors::permissive())
             .wrap(actix_web::middleware::Logger::default())
-            .wrap(actix_session::SessionMiddleware::new(
+            .wrap(actix_session::SessionMiddleware::builder(
                 actix_session::storage::CookieSessionStore::default(),
                 actix_web::cookie::Key::generate(),
-            ))
+            )
+                .cookie_secure(false)
+                .cookie_same_site(actix_web::cookie::SameSite::None)
+                .cookie_http_only(false)
+                .build()
+        )
             .route("/", actix_web::web::get().to(actix_web::HttpResponse::Ok))
             .service(
                 actix_web::web::scope("/auth")
