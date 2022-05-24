@@ -30,6 +30,7 @@ impl Todo {
         SELECT
             id, created_at, completed_at, message
         FROM todos
+        ORDER BY created_at
             "#,
         )
         .fetch_all(executor)
@@ -96,6 +97,22 @@ impl Todo {
         .await
         .map(|_| ())
     }
+
+    pub async fn delete(
+        executor: impl sqlx::PgExecutor<'_>,
+        id: &uuid::Uuid,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query(
+            r#"
+        DELETE FROM todos
+        WHERE id = $1
+            "#,
+        )
+        .bind(id)
+        .execute(executor)
+        .await
+        .map(|_| ())
+    }
 }
 
 pub async fn get_all(app: actix_web::web::Data<crate::App>) -> actix_web::HttpResponse {
@@ -152,5 +169,21 @@ pub async fn resolve(
             }
         }
         _ => actix_web::HttpResponse::NotFound().finish(),
+    }
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct DeleteTodoPayload {
+    id: uuid::Uuid,
+}
+
+pub async fn delete(
+    app: actix_web::web::Data<crate::App>,
+    payload: actix_web::web::Json<DeleteTodoPayload>,
+) -> actix_web::HttpResponse {
+    let payload = payload.into_inner();
+    match Todo::delete(app.pool(), &payload.id).await {
+        Ok(_) => actix_web::HttpResponse::Ok().finish(),
+        Err(_) => actix_web::HttpResponse::NotFound().finish(),
     }
 }

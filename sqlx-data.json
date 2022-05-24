@@ -1,7 +1,7 @@
 {
   "db": "PostgreSQL",
-  "a67cc73d5109841c4a0b6411ccf16e106a0cbbeaa16c4c2ce190d3b4de112597": {
-    "query": "\n        SELECT\n            id, created_at, completed_at, message\n        FROM todos\n            ",
+  "24c70c00789c24e77fe57caa5c7faec4185ccf511bdf342e36958bfcb2283338": {
+    "query": "\n        SELECT\n            id, created_at, completed_at, message\n        FROM todos\n        ORDER BY created_at\n            ",
     "describe": {
       "columns": [
         {

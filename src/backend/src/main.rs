@@ -29,6 +29,7 @@ async fn main() -> std::io::Result<()> {
             .route("/", actix_web::web::get().to(todo::get_all))
             .route("/", actix_web::web::post().to(todo::create))
             .route("/", actix_web::web::put().to(todo::resolve))
+            .route("/", actix_web::web::delete().to(todo::delete))
     })
     .bind(("0.0.0.0", 3000))?
     .run()

@@ -1,0 +1,36 @@
+.todo {
+    border: 1px solid black;
+    padding: 8px;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.todo > * {
+    margin: 4px;
+}
+
+.todo__id {
+    font-size: small;
+}
+
+.todo__times__start {
+    font-size: small;
+    font-weight: bold;
+}
+
+.todo__times__end {
+    font-size: small;
+    font-weight: bold;
+}
+
+.todo__message {
+    border: 1px dashed black;
+    padding: 4px;
+}
+
+.todo__x {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: 8px;
+}
