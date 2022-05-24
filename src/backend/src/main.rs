@@ -1,6 +1,4 @@
-mod auth;
 mod todo;
-mod user;
 
 pub struct App {
     pool: sqlx::Pool<sqlx::Postgres>,
@@ -28,28 +26,9 @@ async fn main() -> std::io::Result<()> {
             .app_data(app.clone())
             .wrap(actix_cors::Cors::permissive())
             .wrap(actix_web::middleware::Logger::default())
-            .wrap(actix_session::SessionMiddleware::builder(
-                actix_session::storage::CookieSessionStore::default(),
-                actix_web::cookie::Key::generate(),
-            )
-                .cookie_secure(false)
-                .cookie_same_site(actix_web::cookie::SameSite::None)
-                .cookie_http_only(false)
-                .build()
-        )
-            .route("/", actix_web::web::get().to(actix_web::HttpResponse::Ok))
-            .service(
-                actix_web::web::scope("/auth")
-                    .route("/", actix_web::web::get().to(auth::whoami))
-                    .route("/logout", actix_web::web::post().to(auth::logout))
-                    .route("/login", actix_web::web::post().to(auth::login)),
-            )
-            .service(
-                actix_web::web::scope("/todo")
-                    .route("/", actix_web::web::get().to(todo::get_all_for_active_user))
-                    .route("/new", actix_web::web::post().to(todo::create))
-                    .route("/resolve", actix_web::web::post().to(todo::resolve)),
-            )
+            .route("/", actix_web::web::get().to(todo::get_all))
+            .route("/", actix_web::web::post().to(todo::create))
+            .route("/", actix_web::web::put().to(todo::resolve))
     })
     .bind(("0.0.0.0", 3000))?
     .run()

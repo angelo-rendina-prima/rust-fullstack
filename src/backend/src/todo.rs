@@ -1,7 +1,6 @@
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Todo {
     id: uuid::Uuid,
-    author_id: uuid::Uuid,
     created_at: chrono::DateTime<chrono::Utc>,
     completed_at: Option<chrono::DateTime<chrono::Utc>>,
     message: String,
@@ -10,10 +9,6 @@ pub struct Todo {
 impl Todo {
     pub fn id(&self) -> &uuid::Uuid {
         &self.id
-    }
-
-    pub fn author_id(&self) -> &uuid::Uuid {
-        &self.author_id
     }
 
     pub fn created_at(&self) -> &chrono::DateTime<chrono::Utc> {
@@ -28,19 +23,14 @@ impl Todo {
         &self.message
     }
 
-    pub async fn get_by_author_id(
-        executor: impl sqlx::PgExecutor<'_>,
-        author_id: &uuid::Uuid,
-    ) -> Result<Vec<Todo>, sqlx::Error> {
+    pub async fn get_all(executor: impl sqlx::PgExecutor<'_>) -> Result<Vec<Todo>, sqlx::Error> {
         sqlx::query_as!(
             Todo,
             r#"
         SELECT
-            id, author_id, created_at, completed_at, message
+            id, created_at, completed_at, message
         FROM todos
-        WHERE author_id = $1
             "#,
-            author_id,
         )
         .fetch_all(executor)
         .await
@@ -54,7 +44,7 @@ impl Todo {
             Todo,
             r#"
         SELECT
-            id, author_id, created_at, completed_at, message
+            id, created_at, completed_at, message
         FROM todos
         WHERE id = $1
             "#,
@@ -71,12 +61,11 @@ impl Todo {
         sqlx::query(
             r#"
         INSERT INTO todos
-            (id, author_id, created_at, completed_at, message)
-        VALUES($1, $2, $3, $4, $5)
+            (id, created_at, completed_at, message)
+        VALUES($1, $2, $3, $4)
             "#,
         )
         .bind(todo.id())
-        .bind(todo.author_id())
         .bind(todo.created_at())
         .bind(todo.completed_at())
         .bind(todo.message())
@@ -93,15 +82,13 @@ impl Todo {
             r#"
         UPDATE todos
         SET id = $1,
-            author_id = $2,
-            created_at = $3,
-            completed_at = $4,
-            message = $5
+            created_at = $2,
+            completed_at = $3,
+            message = $4
         WHERE id = $1
             "#,
         )
         .bind(todo.id())
-        .bind(todo.author_id())
         .bind(todo.created_at())
         .bind(todo.completed_at())
         .bind(todo.message())
@@ -111,16 +98,10 @@ impl Todo {
     }
 }
 
-pub async fn get_all_for_active_user(
-    app: actix_web::web::Data<crate::App>,
-    session: actix_session::Session,
-) -> actix_web::HttpResponse {
-    match session.get::<crate::user::User>("user") {
-        Ok(Some(user)) => match Todo::get_by_author_id(app.pool(), user.id()).await {
-            Ok(posts) => actix_web::HttpResponse::Ok().json(posts),
-            Err(_) => actix_web::HttpResponse::InternalServerError().finish(),
-        },
-        _ => actix_web::HttpResponse::Unauthorized().finish(),
+pub async fn get_all(app: actix_web::web::Data<crate::App>) -> actix_web::HttpResponse {
+    match Todo::get_all(app.pool()).await {
+        Ok(posts) => actix_web::HttpResponse::Ok().json(posts),
+        Err(_) => actix_web::HttpResponse::InternalServerError().finish(),
     }
 }
 
@@ -131,58 +112,45 @@ pub struct NewTodoPayload {
 
 pub async fn create(
     app: actix_web::web::Data<crate::App>,
-    session: actix_session::Session,
     payload: actix_web::web::Json<NewTodoPayload>,
 ) -> actix_web::HttpResponse {
-    match session.get::<crate::user::User>("user") {
-        Ok(Some(user)) => {
-            let id = uuid::Uuid::new_v4();
-            let todo = Todo {
-                id,
-                author_id: *user.id(),
-                created_at: chrono::Utc::now(),
-                completed_at: None,
-                message: payload.into_inner().message,
-            };
-            match Todo::insert(app.pool(), &todo).await {
-                Ok(_) => actix_web::HttpResponse::Ok().body(format!("{id}")),
-                Err(_) => actix_web::HttpResponse::InternalServerError().finish(),
-            }
-        }
-        _ => actix_web::HttpResponse::Unauthorized().finish(),
+    let id = uuid::Uuid::new_v4();
+    let todo = Todo {
+        id,
+        created_at: chrono::Utc::now(),
+        completed_at: None,
+        message: payload.into_inner().message,
+    };
+    match Todo::insert(app.pool(), &todo).await {
+        Ok(_) => actix_web::HttpResponse::Ok().body(format!("{id}")),
+        Err(_) => actix_web::HttpResponse::InternalServerError().finish(),
     }
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct MarkTodoPayload {
+pub struct UpdateTodoPayload {
     id: uuid::Uuid,
     done: bool,
+    message: String,
 }
 
 pub async fn resolve(
     app: actix_web::web::Data<crate::App>,
-    session: actix_session::Session,
-    payload: actix_web::web::Json<MarkTodoPayload>,
+    payload: actix_web::web::Json<UpdateTodoPayload>,
 ) -> actix_web::HttpResponse {
     let payload = payload.into_inner();
-    match session.get::<crate::user::User>("user") {
-        Ok(Some(_)) => match Todo::get_by_id(app.pool(), &payload.id).await {
-            Ok(Some(todo)) => {
-                let todo = Todo {
-                    completed_at: match payload.done {
-                        true => Some(chrono::Utc::now()),
-                        false => None,
-                    },
-                    ..todo
-                };
-                match Todo::update(app.pool(), &todo).await {
-                    Ok(_) => actix_web::HttpResponse::Ok().finish(),
-                    Err(_) => actix_web::HttpResponse::InternalServerError().finish(),
-                }
+    match Todo::get_by_id(app.pool(), &payload.id).await {
+        Ok(Some(mut todo)) => {
+            todo.completed_at = match payload.done {
+                true => Some(chrono::Utc::now()),
+                false => None,
+            };
+            todo.message = payload.message;
+            match Todo::update(app.pool(), &todo).await {
+                Ok(_) => actix_web::HttpResponse::Ok().finish(),
+                Err(_) => actix_web::HttpResponse::InternalServerError().finish(),
             }
-            _ => actix_web::HttpResponse::NotFound().finish(),
-        },
-        Err(x) => actix_web::HttpResponse::BadRequest().body(format!("{x:?}")),
-        _ => actix_web::HttpResponse::Unauthorized().finish(),
+        }
+        _ => actix_web::HttpResponse::NotFound().finish(),
     }
 }

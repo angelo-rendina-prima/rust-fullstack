@@ -45,7 +45,7 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match (msg, &mut model.state) {
         (Msg::Auth(auth_msg), State::Auth(auth_model)) => {
             auth::update(auth_msg, auth_model, &mut orders.proxy(Msg::Auth))
-        },
+        }
     }
 }
 

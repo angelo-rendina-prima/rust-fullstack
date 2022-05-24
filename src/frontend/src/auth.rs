@@ -1,5 +1,5 @@
 use seed::{prelude::*, *};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 struct User {
@@ -54,10 +54,10 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match msg {
         Msg::EmailChanged(email) => {
             model.credentials.email = email;
-        },
+        }
         Msg::PasswordChanged(password) => {
             model.credentials.password = password;
-        },
+        }
         Msg::LogIn => {
             let credentials = model.credentials.clone();
             model.state = State::Working;
@@ -70,17 +70,15 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
                     Ok(request) => request,
                     Err(_) => {
                         return Msg::AuthFailed;
-                    },
+                    }
                 };
 
-                let response = request
-                    .fetch()
-                    .await;
+                let response = request.fetch().await;
                 let response = match response {
                     Ok(response) => response,
                     Err(_) => {
                         return Msg::AuthFailed;
-                    },
+                    }
                 };
                 if response.check_status().is_err() {
                     return Msg::AuthFailed;
@@ -91,31 +89,29 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
                     .method(Method::Get)
                     .credentials(web_sys::RequestCredentials::Include);
 
-                let response = request
-                    .fetch()
-                    .await;
+                let response = request.fetch().await;
                 let response = match response {
                     Ok(response) => response,
                     Err(_) => {
                         return Msg::AuthFailed;
-                    },
+                    }
                 };
                 let user = match response.json::<User>().await {
                     Ok(user) => user,
                     Err(_) => {
                         return Msg::AuthFailed;
-                    },
+                    }
                 };
 
                 Msg::Authenticated(user)
             });
-        },
+        }
         Msg::AuthFailed => {
             model.state = State::Credentials;
-        },
+        }
         Msg::Authenticated(_) => {
-            model.state =  State::Credentials;
-        },
+            model.state = State::Credentials;
+        }
     }
 }
 
@@ -125,7 +121,7 @@ pub fn view(model: &Model) -> Node<Msg> {
         div!(
             label!("Email"),
             input!(
-                attrs!{
+                attrs! {
                     // At::Disabled => !model.can_edit_credentials(),
                 },
                 input_ev(Ev::Input, move |email| Msg::EmailChanged(email))
@@ -134,7 +130,7 @@ pub fn view(model: &Model) -> Node<Msg> {
         div!(
             label!("Password"),
             input!(
-                attrs!{
+                attrs! {
                     // At::Disabled => !model.can_edit_credentials(),
                 },
                 input_ev(Ev::Input, move |password| Msg::PasswordChanged(password))
@@ -142,7 +138,7 @@ pub fn view(model: &Model) -> Node<Msg> {
         ),
         button!(
             "Admin",
-            attrs!{
+            attrs! {
                 // At::Disabled => !model.can_edit_credentials(),
             },
             ev(Ev::Click, |_| Msg::LogIn)

@@ -1,7 +1,7 @@
 {
   "db": "PostgreSQL",
-  "0281667bf30e92b97545b713abe716ee526c9dd64d41777013391e9c118276eb": {
-    "query": "\n        SELECT\n            id, author_id, created_at, completed_at, message\n        FROM todos\n        WHERE author_id = $1\n            ",
+  "a67cc73d5109841c4a0b6411ccf16e106a0cbbeaa16c4c2ce190d3b4de112597": {
+    "query": "\n        SELECT\n            id, created_at, completed_at, message\n        FROM todos\n            ",
     "describe": {
       "columns": [
         {
@@ -11,21 +11,52 @@
         },
         {
           "ordinal": 1,
-          "name": "author_id",
-          "type_info": "Uuid"
-        },
-        {
-          "ordinal": 2,
           "name": "created_at",
           "type_info": "Timestamptz"
         },
         {
-          "ordinal": 3,
+          "ordinal": 2,
           "name": "completed_at",
           "type_info": "Timestamptz"
         },
         {
-          "ordinal": 4,
+          "ordinal": 3,
+          "name": "message",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": [
+        false,
+        false,
+        true,
+        false
+      ]
+    }
+  },
+  "bff0d3feaa4bb2b3e37cfc6eb3625f2af3cb217be6fdda96627adab0bf016c4b": {
+    "query": "\n        SELECT\n            id, created_at, completed_at, message\n        FROM todos\n        WHERE id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Uuid"
+        },
+        {
+          "ordinal": 1,
+          "name": "created_at",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 2,
+          "name": "completed_at",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 3,
           "name": "message",
           "type_info": "Text"
         }
@@ -38,79 +69,7 @@
       "nullable": [
         false,
         false,
-        false,
         true,
-        false
-      ]
-    }
-  },
-  "07fbc87ef39294e07c42cf1747c04775943dbc946fc483f3c6369dffcd0e485a": {
-    "query": "\n        SELECT\n            id, author_id, created_at, completed_at, message\n        FROM todos\n        WHERE id = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Uuid"
-        },
-        {
-          "ordinal": 1,
-          "name": "author_id",
-          "type_info": "Uuid"
-        },
-        {
-          "ordinal": 2,
-          "name": "created_at",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 3,
-          "name": "completed_at",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 4,
-          "name": "message",
-          "type_info": "Text"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Uuid"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        true,
-        false
-      ]
-    }
-  },
-  "9e996d232b50f3c244de8e1aba7d2308af8dab44fe8059d2f1d39fc781cadf95": {
-    "query": "\n        SELECT\n            id, email\n        FROM users\n        WHERE email = $1 AND password = $2\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Uuid"
-        },
-        {
-          "ordinal": 1,
-          "name": "email",
-          "type_info": "Text"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Text"
-        ]
-      },
-      "nullable": [
-        false,
         false
       ]
     }
