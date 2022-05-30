@@ -1,5 +1,6 @@
 [env]
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/todo"
+CARGO_TARGET_DIR="target"
+DATABASE_URL="postgresql://postgres:postgres@postgres:5432/todo"
 RUST_LOG="debug"
 PORT="8080"
 
@@ -32,6 +33,7 @@ args = ["./src/frontend", "--port", "${PORT}"]
 
 [tasks.db-setup]
 description = "Setup DB"
+install_crate = { crate_name = "sqlx-cli" }
 command = "sqlx"
 args = ["database", "setup", "--source=./migrations/"]
 

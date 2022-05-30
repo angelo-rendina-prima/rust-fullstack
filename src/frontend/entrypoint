@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ -n "$1" ]; then
+  sh -c "$@"
+else
+  cargo make build
+  cargo make serve
+fi

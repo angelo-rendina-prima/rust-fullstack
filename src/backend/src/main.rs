@@ -16,7 +16,7 @@ async fn main() -> std::io::Result<()> {
 
     let app = actix_web::web::Data::new(App {
         pool: sqlx::pool::PoolOptions::new()
-            .connect("postgresql://postgres:postgres@localhost:5432/todo")
+            .connect("postgresql://postgres:postgres@postgres:5432/todo")
             .await
             .expect("Could not connect to the DB"),
     });

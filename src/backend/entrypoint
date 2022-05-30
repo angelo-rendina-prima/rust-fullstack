@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ -n "$1" ]; then
+  /bin/sh -c "$@"
+else
+  sleep 10
+  cargo make run
+fi

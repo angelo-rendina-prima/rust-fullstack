@@ -8,3 +8,35 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
+
+  frontend:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - make_cache:/root/.cache
+      - .:/app
+      - target:/app/target
+      - frontend_target:/app/src/frontend/target
+    working_dir: /app
+    entrypoint: ./src/frontend/entrypoint
+  
+  backend:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - make_cache:/root/.cache
+      - .:/app
+      - target:/app/target
+      - backend_target:/app/src/backend/target
+    working_dir: /app
+    entrypoint: ./src/backend/entrypoint
+    depends_on:
+      - postgres
+
+volumes:
+  make_cache:
+  target:
+  frontend_target:
+  backend_target:
